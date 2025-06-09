@@ -1,0 +1,36 @@
+# Update-DockerConfig.ps1
+$wslConfigPath = "$env:USERPROFILE\.wslconfig"
+$wslConfig = @"
+[wsl2]
+memory=16GB
+processors=12
+swap=2GB
+localhostForwarding=true
+"@
+Set-Content -Path $wslConfigPath -Value $wslConfig -Force
+Write-Host "✅ .wslconfig updated at $wslConfigPath"
+
+$daemonConfigPath = "$env:PROGRAMDATA\Docker\config\daemon.json"
+$dockerDaemonJson = @"
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "experimental": false,
+  "features": {
+    "buildkit": true
+  }
+}
+"@
+New-Item -Path (Split-Path $daemonConfigPath) -ItemType Directory -Force | Out-Null
+Set-Content -Path $daemonConfigPath -Value $dockerDaemonJson -Force
+Write-Host "✅ Docker daemon config updated at $daemonConfigPath"
+
+Write-Host "⏳ Restarting WSL and Docker services..."
+wsl --shutdown
+Start-Sleep -Seconds 5
+Restart-Service com.docker.service -Force
+Write-Host "✅ Docker and WSL restarted. Configuration applied."
