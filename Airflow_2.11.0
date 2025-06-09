@@ -1,0 +1,79 @@
+# Apache Airflow 2.11.0 Docker Installation Guide
+
+## Prerequisites
+
+- Docker Engine 20.10.0+ 
+- Docker Compose 1.29.0+
+- At least 4GB of RAM allocated to Docker
+
+## Installation Steps
+
+### 1. Create Project Directory
+```bash
+mkdir airflow-docker
+cd airflow-docker
+```
+
+### 2. Download the Official Docker Compose File
+```bash
+curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.11.0/docker-compose.yaml'
+```
+
+### 3. Create Required Directories
+```bash
+mkdir -p ./dags ./logs ./plugins ./config
+```
+
+### 4. Set Airflow User ID
+```bash
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+```
+
+### 5. Initialize the Database
+```bash
+docker compose up airflow-init
+```
+
+### 6. Start Airflow Services
+```bash
+docker compose up -d
+```
+
+### 7. Access Airflow Web UI
+- URL: http://localhost:8000
+- Username: `airflow`
+- Password: `airflow`
+
+## Useful Commands
+
+### Stop Services
+```bash
+docker compose down
+```
+
+### View Logs
+```bash
+docker compose logs airflow-webserver
+docker compose logs airflow-scheduler
+```
+
+### Restart Services
+```bash
+docker compose restart
+```
+
+### Clean Up (Remove volumes)
+```bash
+docker compose down --volumes --remove-orphans
+```
+
+## Directory Structure
+```
+airflow-docker/
+├── docker-compose.yaml
+├── .env
+├── dags/          # Your DAG files go here
+├── logs/          # Airflow logs
+├── plugins/       # Custom plugins
+└── config/        # Configuration files
+```
